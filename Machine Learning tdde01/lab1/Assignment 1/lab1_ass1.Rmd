@@ -1,0 +1,64 @@
+---
+title: "lab1"
+author: "Uno Österman"
+date: '2021-01-05'
+output: 
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Assignment 1: Handwritten digit recognition with K-means
+
+##Assignment 1
+
+##1. Import & Split data
+Import data from optdigits.csv and devide it into training, validation and test sets (50/25/25)
+
+```{r split_data, include=FALSE}
+library(readr)
+optdigits <- read_csv("../Assignment 1/optdigits.csv",col_names = FALSE)
+# The target have to be a nominal value in order for 
+# the kknn prediction to work. We tranform target X65 using
+# as.factor function. 
+optdigits$X65 <- as.factor(optdigits$X65)
+
+
+n=dim(optdigits)[1]
+set.seed(12345)
+id=sample(1:n, floor(n*0.5))
+train.opt=optdigits[id, ]
+id1=setdiff(1:n, id)
+set.seed(12345)
+id2=sample(id1, floor(n*0.25))
+valid.opt=optdigits[id2, ]
+id3=setdiff(id1,id2)
+test.opt=optdigits[id3, ]
+
+
+
+```
+
+## 2. Fitting with kknn
+First, a 30-nearest neighbor classifier is fitted using the kknn() function from the kknn package. 
+The rectangular kernel is used which is a standard unweighted knn.  
+```{r kknn, include=FALSE}
+# Import library kknn
+# Needs to be installed on the computer.
+library(kknn)
+library(gtable)
+kknn.opt <- kknn(formula = X65 ~ ., train = train.opt, test = test.opt, scale = TRUE, k = 30, kernel = "rectangular") 
+
+kknn.training <- kknn(formula = X65 ~ ., train = train.opt, test = test.opt, scale = TRUE, k = 30, kernel = "rectangular")
+
+kable(confusion_table, caption="Confusion Table")
+
+kable(table(opt.training$X65),padding =0, align = "l")
+
+kable(table(opt.test$X65))
+
+```
